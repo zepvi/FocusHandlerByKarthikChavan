@@ -1,114 +1,177 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
-import React from 'react';
-import {
+import React, { Component } from 'react';
+import { 
+  Text, 
+  View, 
+  TVEventHandler,
   SafeAreaView,
   StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
+  Image,
+  TouchableOpacity,
+  ToastAndroid, 
 } from 'react-native';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 
-const App: () => React$Node = () => {
-  return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
+export default class App extends Component {
+    constructor(props){
+      super(props);
+      this.state = {
+         box: 'left top'   
+      }
+    }
+
+    setcomand(box) {
+      this.setState( () => { return { box }; });
+    }
+
+
+_enableTVEventHandler() {
+      var self = this;
+      this._tvEventHandler = new TVEventHandler();
+      this._tvEventHandler.enable(this, function (cmp, evt) {
+        if (evt && evt.eventType === 'right') {
+              if ((self.state.box == 'left top') || (self.state.box == 'left bottom')) {
+                 if (self.state.box == 'left top')
+                    self.setcomand('right top');
+                 else
+                    self.setcomand('right bottom')
+              }
+          } else if (evt && evt.eventType === 'up') {
+              if ((self.state.box == 'left bottom') || (self.state.box == 'right bottom')) {
+                if (self.state.box == 'left bottom')
+                   self.setcomand('left top');
+                else
+                   self.setcomand('right top')
+              }
+          } else if (evt && evt.eventType === 'left') {
+              if ((self.state.box == 'right top') || (self.state.box == 'right bottom')) {
+                if (self.state.box == 'right top')
+                   self.setcomand('left top');
+                else
+                   self.setcomand('left bottom')
+              }
+          } else if (evt && evt.eventType === 'down') {
+              if ((self.state.box == 'right top') || (self.state.box == 'left top')) {
+                if (self.state.box == 'right top')
+                   self.setcomand('right bottom');
+                else
+                   self.setcomand('left bottom')
+              }
+          } else if (evt && evt.eventType === 'select') {
+              //self.press();
+          }
+      });
+}
+
+_disableTVEventHandler() {
+      if (this._tvEventHandler) {
+          this._tvEventHandler.disable();
+          delete this._tvEventHandler;
+      }
+  }
+
+componentDidMount() {
+      this._enableTVEventHandler();
+  }
+
+componentWillUnmount() {
+      this._disableTVEventHandler();
+  }
+
+onButtonPressed(boxName)  {
+    ToastAndroid.show(`You clicked the ${boxName} button`, ToastAndroid.SHORT)
+ }
+
+    render() {
+        return (
+          <SafeAreaView>
+          <View style={styles.container}>
+                <Image source={require('./logo.png')} style={styles.logo} />
+                <View style={styles.section}>
+                     <View style={styles.boxWrapper}>
+                         <TouchableOpacity 
+                           onPress={() => this.onButtonPressed('left top')}
+                           style={[styles.box, {backgroundColor: this.state.box == 'left top' ? '#ef4323' : '#194e9a'}]}>
+                             <Text>&nbsp;</Text>
+                         </TouchableOpacity>
+                         <Text 
+                           style={[styles.text, {color: this.state.box == 'left top' ? '#ef4323' : 'black'}]}>
+                             LEFT TOP
+                         </Text>
+                     </View>
+                     <View style={styles.boxWrapper}>
+                         <TouchableOpacity 
+                           onPress={() => this.onButtonPressed('right top')}
+                           style={[styles.box, {backgroundColor: this.state.box == 'right top' ? '#ef4323' : '#194e9a'}]}>
+                             <Text>&nbsp;</Text>
+                         </TouchableOpacity>
+                         <Text 
+                           style={[styles.text, {color: this.state.box == 'right top' ? '#ef4323' : 'black'}]}>
+                             RIGHT TOP
+                         </Text>
+                     </View>
+                </View>
+                <View style={styles.section}>
+                     <View style={styles.boxWrapper}>
+                         <TouchableOpacity 
+                           onPress={() => this.onButtonPressed('left bottom')}
+                           style={[styles.box, {backgroundColor: this.state.box == 'left bottom' ? '#ef4323' : '#194e9a'}]}>
+                             <Text>&nbsp;</Text>
+                         </TouchableOpacity>
+                         <Text 
+                           style={[styles.text, {color: this.state.box == 'left bottom' ? '#ef4323' : 'black'}]}>
+                             LEFT BOTTOM
+                         </Text>
+                     </View>
+                     <View style={styles.boxWrapper}>
+                         <TouchableOpacity 
+                           onPress={() => this.onButtonPressed('right bottom')}
+                           style={[styles.box, {backgroundColor: this.state.box == 'right bottom' ? '#ef4323' : '#194e9a'}]}>
+                             <Text>&nbsp;</Text>
+                         </TouchableOpacity>
+                         <Text 
+                            style={[styles.text, {color: this.state.box == 'right bottom' ? '#ef4323' : 'black'}]}>
+                              RIGHT BOTTOM
+                         </Text>
+                     </View>
+                </View>
           </View>
-        </ScrollView>
-      </SafeAreaView>
-    </>
-  );
-};
+       </SafeAreaView>
+        );
+  }
+}
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
+  container: {
+    margin: 20
   },
-  engine: {
-    position: 'absolute',
-    right: 0,
+
+  logo: {
+    width: 120,
+    height: 30,
+    alignSelf: 'flex-end',
+    marginBottom: 30
   },
-  body: {
-    backgroundColor: Colors.white,
+
+  box: {
+    width: 130,
+    height: 100,
   },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+
+  section: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
+
+  boxWrapper: {
+    marginVertical: 15,
+    marginHorizontal: 25
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
+
+  text: {
+    alignSelf: 'center',
+  }
 });
 
-export default App;
+
+
